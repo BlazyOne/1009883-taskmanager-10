@@ -1,25 +1,20 @@
-import {COLORS} from '../const.js';
-import {getRandomIntegerNumber, getRandomArrayItem, shuffle} from '../utils.js';
+import {COLORS, DAYS} from '../const.js';
+import {getRandomBoolean, getRandomIntegerNumber, getRandomArrayItem, shuffle} from '../utils.js';
 
 const TAGS_MAX = 3;
 
-const DescriptionItems = [
+const DESCRIPTION_ITEMS = [
   `Изучить теорию`,
   `Сделать домашку`,
   `Пройти интенсив на соточку`
 ];
 
-const DefaultRepeatingDays = {
-  'mo': false,
-  'tu': false,
-  'we': false,
-  'th': false,
-  'fr': false,
-  'sa': false,
-  'su': false
-};
+const DEFAULT_REPEATING_DAYS = DAYS.reduce((acc, day) => {
+  acc[day] = false;
+  return acc;
+}, {});
 
-const Tags = [
+const TAGS = [
   `homework`,
   `theory`,
   `practice`,
@@ -29,7 +24,7 @@ const Tags = [
 
 const getRandomDate = () => {
   const targetDate = new Date();
-  const sign = Math.random() >= 0.5 ? 1 : -1;
+  const sign = getRandomArrayItem([-1, 1]);
   const diffValue = sign * getRandomIntegerNumber(0, 7);
 
   targetDate.setDate(targetDate.getDate() + diffValue);
@@ -38,8 +33,8 @@ const getRandomDate = () => {
 };
 
 const generateRepeatingDays = () =>
-  Object.assign({}, DefaultRepeatingDays, {
-    'mo': Math.random() >= 0.5
+  Object.assign({}, DEFAULT_REPEATING_DAYS, {
+    'mo': getRandomBoolean()
   });
 
 const generateTags = (tags) => {
@@ -48,21 +43,22 @@ const generateTags = (tags) => {
   return tagsCopy.slice(0, getRandomIntegerNumber(0, TAGS_MAX));
 };
 
-const generateTask = () => {
-  const dueDate = Math.random() >= 0.5 ? null : getRandomDate();
+const generateTask = (...rest) => {
+  const dueDate = getRandomBoolean() ? null : getRandomDate();
 
   return {
-    description: getRandomArrayItem(DescriptionItems),
+    id: rest[1] + 1,
+    description: getRandomArrayItem(DESCRIPTION_ITEMS),
     dueDate,
-    repeatingDays: dueDate ? DefaultRepeatingDays : generateRepeatingDays(),
-    tags: new Set(generateTags(Tags)),
+    repeatingDays: dueDate ? DEFAULT_REPEATING_DAYS : generateRepeatingDays(),
+    tags: new Set(generateTags(TAGS)),
     color: getRandomArrayItem(COLORS),
-    isFavorite: Math.random() >= 0.5,
-    isArchive: Math.random() >= 0.5
+    isFavorite: getRandomBoolean(),
+    isArchive: getRandomBoolean()
   };
 };
 
 const generateTasks = (count) =>
-  new Array(count).fill(``).map(generateTask);
+  Array.from({length: count}, generateTask);
 
 export {generateTasks};

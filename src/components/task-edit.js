@@ -1,18 +1,18 @@
 import {COLORS, DAYS, MONTH_NAMES} from '../const.js';
-import {formatTime} from '../utils.js';
+import {formatTime, createElement} from '../utils.js';
 
-const createRepeatinDaysMarkup = (days, repeatingDays) =>
+const createRepeatinDaysMarkup = (days, repeatingDays, id) =>
   days
     .map((day) =>
       `<input
         class="visually-hidden card__repeat-day-input"
         type="checkbox"
-        id="repeat-${day}-4"
+        id="repeat-${day}-${id}"
         name="repeat"
         value="${day}"
         ${repeatingDays[day] ? `checked` : ``}
       />
-      <label class="card__repeat-day" for="repeat-${day}-4">
+      <label class="card__repeat-day" for="repeat-${day}-${id}">
         ${day}
       </label>`
     )
@@ -38,19 +38,19 @@ const createHashtagsMarkup = (tags) =>
     )
     .join(`\n`);
 
-const createColorsMarkup = (colors, currentColor) =>
+const createColorsMarkup = (colors, currentColor, id) =>
   colors
     .map((color) =>
       `<input
         type="radio"
-        id="color-${color}-4"
+        id="color-${color}-${id}"
         class="card__color-input card__color-input--${color} visually-hidden"
         name="color"
         value="${color}"
         ${currentColor === color ? `checked` : ``}
       />
       <label
-        for="color-${color}-4"
+        for="color-${color}-${id}"
         class="card__color card__color--${color}">
         ${color}
       </label>`
@@ -58,7 +58,7 @@ const createColorsMarkup = (colors, currentColor) =>
     .join(`\n`);
 
 const createTaskEditTemplate = (task) => {
-  const {description, tags, dueDate, color, repeatingDays} = task;
+  const {id, description, tags, dueDate, color, repeatingDays} = task;
 
   const isExpired = dueDate instanceof Date && dueDate < Date.now();
   const isDateShowing = !!dueDate;
@@ -70,9 +70,9 @@ const createTaskEditTemplate = (task) => {
   const repeatClass = isRepeatingTask ? `card--repeat` : ``;
   const deadlineClass = isExpired ? `card--deadline` : ``;
 
-  const repeatingDaysMarkup = createRepeatinDaysMarkup(DAYS, repeatingDays);
+  const repeatingDaysMarkup = createRepeatinDaysMarkup(DAYS, repeatingDays, id);
   const tagsMarkup = createHashtagsMarkup(tags);
-  const colorsMarkup = createColorsMarkup(COLORS, color);
+  const colorsMarkup = createColorsMarkup(COLORS, color, id);
 
   return `\
     <article class="card card--edit card--${color} ${repeatClass} ${deadlineClass}">
@@ -166,4 +166,27 @@ ${
     </article>`;
 };
 
-export {createTaskEditTemplate};
+class TaskEdit {
+  constructor(task) {
+    this._task = task;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTaskEditTemplate(this._task);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export default TaskEdit;

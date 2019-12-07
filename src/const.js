@@ -14,7 +14,7 @@ const MONTH_NAMES = [
   `September`,
   `October`,
   `November`,
-  `December`,
+  `December`
 ];
 
 export {COLORS, DAYS, MONTH_NAMES};

@@ -1,3 +1,5 @@
+const getRandomBoolean = () => Math.random() >= 0.5;
+
 const getRandomIntegerNumber = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
 
 const getRandomArrayItem = (array) => array[getRandomIntegerNumber(0, array.length - 1)];
@@ -14,7 +16,7 @@ const shuffle = (data) => {
 const castTimeFormat = (value) => value < 10 ? `0${value}` : String(value);
 
 const formatTime = (date) => {
-  const hours = castTimeFormat(date.getHours() % 12);
+  let hours = castTimeFormat(date.getHours() % 12);
   if (hours === `00`) {
     hours = `12`;
   }
@@ -25,4 +27,22 @@ const formatTime = (date) => {
   return `${hours}:${minutes} ${interval}`;
 };
 
-export {getRandomIntegerNumber, getRandomArrayItem, formatTime, shuffle};
+const createElement = (template) => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template.trim();
+
+  return newElement.firstChild;
+};
+
+const render = (container, element, place = `beforeend`) => {
+  switch (place) {
+    case `beforeend`:
+      container.append(element);
+      break;
+    case `afterbegin`:
+      container.prepend(element);
+      break;
+  }
+};
+
+export {getRandomBoolean, getRandomIntegerNumber, getRandomArrayItem, formatTime, shuffle, createElement, render};
