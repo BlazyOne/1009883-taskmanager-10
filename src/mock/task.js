@@ -1,5 +1,5 @@
 import {COLORS, DAYS} from '../const.js';
-import {getRandomBoolean, getRandomIntegerNumber, getRandomArrayItem, shuffle} from '../utils.js';
+import {getRandomBoolean, getRandomIntegerNumber, getRandomArrayItem, shuffle} from '../utils/common.js';
 
 const TAGS_MAX = 3;
 
@@ -43,11 +43,11 @@ const generateTags = (tags) => {
   return tagsCopy.slice(0, getRandomIntegerNumber(0, TAGS_MAX));
 };
 
-const generateTask = (...rest) => {
+const generateTask = (index) => {
   const dueDate = getRandomBoolean() ? null : getRandomDate();
 
   return {
-    id: rest[1] + 1,
+    id: index + 1,
     description: getRandomArrayItem(DESCRIPTION_ITEMS),
     dueDate,
     repeatingDays: dueDate ? DEFAULT_REPEATING_DAYS : generateRepeatingDays(),
@@ -59,6 +59,6 @@ const generateTask = (...rest) => {
 };
 
 const generateTasks = (count) =>
-  Array.from({length: count}, generateTask);
+  Array.from({length: count}, (item, index) => generateTask(index));
 
 export {generateTasks};
