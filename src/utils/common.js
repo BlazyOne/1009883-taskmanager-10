@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 const getRandomBoolean = () => Math.random() >= 0.5;
 
 const getRandomIntegerNumber = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
@@ -13,18 +15,10 @@ const shuffle = (data) => {
   }
 };
 
-const castTimeFormat = (value) => value < 10 ? `0${value}` : String(value);
+const formatTime = (date) =>
+  moment(date).format(`hh:mm A`);
 
-const formatTime = (date) => {
-  let hours = castTimeFormat(date.getHours() % 12);
-  if (hours === `00`) {
-    hours = `12`;
-  }
-  const minutes = castTimeFormat(date.getMinutes());
+const formatDate = (date) =>
+  moment(date).format(`DD MMMM`);
 
-  const interval = date.getHours() > 11 ? `pm` : `am`;
-
-  return `${hours}:${minutes} ${interval}`;
-};
-
-export {getRandomBoolean, getRandomIntegerNumber, getRandomArrayItem, shuffle, formatTime};
+export {getRandomBoolean, getRandomIntegerNumber, getRandomArrayItem, shuffle, formatTime, formatDate};
