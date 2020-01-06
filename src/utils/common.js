@@ -21,4 +21,14 @@ const formatTime = (date) =>
 const formatDate = (date) =>
   moment(date).format(`DD MMMM`);
 
-export {getRandomBoolean, getRandomIntegerNumber, getRandomArrayItem, shuffle, formatTime, formatDate};
+const isRepeating = (repeatingDays) => Object.values(repeatingDays).some(Boolean);
+
+const isOneDay = (dateA, dateB) => {
+  const a = moment(dateA);
+  const b = moment(dateB);
+  return a.diff(b, `days`) === 0 && dateA.getDate() === dateB.getDate();
+};
+
+const isOverdueDate = (dueDate, date) => dueDate < date && !isOneDay(date, dueDate);
+
+export {getRandomBoolean, getRandomIntegerNumber, getRandomArrayItem, shuffle, formatTime, formatDate, isRepeating, isOneDay, isOverdueDate};
