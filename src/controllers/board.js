@@ -129,7 +129,7 @@ class BoardController {
       this._tasksModel.removeTask(oldData.id);
       this._updateTasks(this._showingTasksCount);
     } else {
-      const isSuccess = this._tasksModel.updateTask(oldData.id, newData);
+      const isSuccess = this._tasksModel.updateTasks(oldData.id, newData);
 
       if (isSuccess) {
         taskController.render(newData, `default`);
