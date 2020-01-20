@@ -41,7 +41,7 @@ class Tasks {
     return true;
   }
 
-  updateTasks(id, task) {
+  updateTask(id, task) {
     const index = this._tasks.findIndex((it) => it.id === id);
 
     if (index === -1) {

@@ -1,6 +1,10 @@
 import TaskComponent from '../components/task.js';
 import TaskEditComponent from '../components/task-edit.js';
-import {render, replace, remove} from '../utils/render';
+import TaskModel from '../models/task.js';
+import {render, replace, remove} from '../utils/render.js';
+import {DAYS} from '../const.js';
+
+const SHAKE_ANIMATION_TIMEOUT = 600;
 
 const EmptyTask = {
   description: ``,
@@ -18,6 +22,27 @@ const EmptyTask = {
   color: `black`,
   isFavorite: false,
   isArchive: false,
+};
+
+const parseFormData = (formData) => {
+  const date = formData.get(`date`);
+  const repeatingDays = DAYS.reduce((acc, day) => {
+    acc[day] = false;
+    return acc;
+  }, {});
+
+  return new TaskModel({
+    'description': formData.get(`text`),
+    'due_date': date ? new Date(date) : null,
+    'tags': formData.getAll(`hashtag`),
+    'repeating_days': formData.getAll(`repeat`).reduce((acc, it) => {
+      acc[it] = true;
+      return acc;
+    }, repeatingDays),
+    'color': formData.get(`color`),
+    'is_favorite': false,
+    'is_done': false,
+  });
 };
 
 class TaskController {
@@ -44,30 +69,47 @@ class TaskController {
 
     this._taskComponent.setEditButtonClickHandler(() => this._replaceTaskToEdit());
 
-    this._taskComponent.setArchiveButtonClickHandler(() =>
-      this._onDataChange(this, task, Object.assign({}, task, {
-        isArchive: !task.isArchive
-      })));
+    this._taskComponent.setArchiveButtonClickHandler(() => {
+      const newTask = TaskModel.clone(task);
+      newTask.isArchive = !newTask.isArchive;
 
-    this._taskComponent.setFavoritesButtonClickHandler(() =>
-      this._onDataChange(this, task, Object.assign({}, task, {
-        isFavorite: !task.isFavorite
-      })));
+      this._onDataChange(this, task, newTask);
+    });
+
+    this._taskComponent.setFavoritesButtonClickHandler(() => {
+      const newTask = TaskModel.clone(task);
+      newTask.isFavorite = !newTask.isFavorite;
+
+      this._onDataChange(this, task, newTask);
+    });
 
     this._taskEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
-      const data = this._taskEditComponent.getData();
+
+      this._taskEditComponent.setData({
+        saveButtonText: `Saving...`,
+      });
+
+      const formData = this._taskEditComponent.getData();
+      const data = parseFormData(formData);
+
       this._onDataChange(this, task, data);
-      this._replaceEditToTask();
     });
 
-    this._taskEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, task, null));
+    this._taskEditComponent.setDeleteButtonClickHandler(() => {
+      this._taskEditComponent.setData({
+        deleteButtonText: `Deleting...`,
+      });
+
+      this._onDataChange(this, task, null);
+    });
 
     switch (mode) {
       case `default`:
         if (oldTaskEditComponent && oldTaskComponent) {
           replace(this._taskComponent, oldTaskComponent);
           replace(this._taskEditComponent, oldTaskEditComponent);
+          this._replaceEditToTask();
         } else {
           render(this._container, this._taskComponent);
         }
@@ -93,6 +135,21 @@ class TaskController {
     remove(this._taskEditComponent);
     remove(this._taskComponent);
     document.removeEventListener(`keydown`, this._onEscKeyDown);
+  }
+
+  shake() {
+    this._taskEditComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    this._taskComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+
+    setTimeout(() => {
+      this._taskEditComponent.getElement().style.animation = ``;
+      this._taskComponent.getElement().style.animation = ``;
+
+      this._taskEditComponent.setData({
+        saveButtonText: `Save`,
+        deleteButtonText: `Delete`,
+      });
+    }, SHAKE_ANIMATION_TIMEOUT);
   }
 
   _replaceEditToTask() {
