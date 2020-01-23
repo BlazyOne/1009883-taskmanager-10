@@ -126,7 +126,7 @@ class BoardController {
         this._api.createTask(newData)
           .then((taskModel) => {
             this._tasksModel.addTask(taskModel);
-            taskController.render(newData, `default`);
+            taskController.render(taskModel, `default`);
 
             if (document.querySelector(`.load-more`)) {
               const destroyedTask = this._showedTaskControllers.pop();

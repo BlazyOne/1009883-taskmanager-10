@@ -86,12 +86,12 @@ class TaskController {
     this._taskEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
 
+      const formData = this._taskEditComponent.getData();
+      const data = parseFormData(formData);
+
       this._taskEditComponent.setData({
         saveButtonText: `Saving...`,
       });
-
-      const formData = this._taskEditComponent.getData();
-      const data = parseFormData(formData);
 
       this._onDataChange(this, task, data);
     });
